@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { auth, googleProvider } from '../config/firebase'; // Corrected googleProvider import
 import { createUserWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth'; // Corrected imports
 
+
+
 export default function Auth() {
     const [login, setLogin] = useState({
         email: "",
         password: ""
     });
+
+    
 
     const handleChange = (e) => {
         setLogin({ ...login, [e.target.name]: e.target.value });
@@ -55,6 +59,9 @@ export default function Auth() {
             <div>
                 <button onClick={handleSignOut}>Sign Out</button>
             </div>
+
+
+            
         </>
     );
 }
