@@ -16,21 +16,20 @@ export default function Auth() {
         setLogin({ ...login, [e.target.name]: e.target.value });
     }
 
-    console.log(auth.currentUser?.email); // Corrected currentUser.email access
-
+    console.log(auth.currentUser?.email); 
     const SignIn = async (e) => {
         e.preventDefault();
         try {
             const { email, password } = login;
             await createUserWithEmailAndPassword(auth, email, password);
         } catch (err) {
-            console.log(err.message); // Logging error message for better debugging
+            console.log(err.message); 
         }
     }
 
-    const handleGoogle = async () => { // Renamed handlegoogle to handleGoogle for consistency
+    const handleGoogle = async () => {
         try {
-            await signInWithPopup(auth, googleProvider); // Corrected provider name
+            await signInWithPopup(auth, googleProvider); 
         } catch (err) {
             console.log(err.message);
         }

@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { db } from '../config/firebase';
-import { collection, getDocs, addDoc, deleteDoc,doc } from 'firebase/firestore';
-
+import { db,auth,storage } from '../config/firebase';
+import { collection, getDocs, addDoc, deleteDoc,doc,updateDoc } from 'firebase/firestore';
+import {ref,uploadBytes} from 'firebase/storage';
 export default function Movies() {
     const [moviesList, setMoviesList] = useState([]); 
     const moviesCollectionRef = collection(db, "movies");
-
+    const [updateTitle,setUpdateMoive] = useState("");
+    const [fileUplode,setFileUplode] = useState(null);
     const [data, setData] = useState({
         moive: "",
         release: "",
-        box: false // Initial value for checkbox
+        box: false 
     });
 
     const fetchData = async () => {
@@ -29,13 +30,35 @@ export default function Movies() {
     const deleteMoive = async (id) => {
         console.log("Deleting movie with ID:", id);
         try {
-            const moiveDoc = doc(db, "movies", id);
-            await deleteDoc(moiveDoc);
+            const movieDoc = doc(db, "movies", id);
+            await deleteDoc(movieDoc);
             console.log("Movie deleted successfully.");
             fetchData(); // Refresh movie list after deletion
         } catch (error) {
             console.error("Error deleting movie:", error.message);
         }
+    }
+
+    const updateMoive = async(id)=>{
+        try{
+            const movieDoc = doc(db,"movies",id);
+            await updateDoc(movieDoc, { moive: updateTitle });
+        }
+        catch (err){
+            console.log(err)
+        }
+    }
+
+    const uploadFile = async()=>{
+        if(!fileUplode)return;
+        const fileFolderRef = ref(storage, `projectFiles/${fileUplode[0].name}`);
+
+        try{
+            await uploadBytes(fileFolderRef,fileUplode)
+        }catch (err){
+            console.log(err);
+        }
+    
     }
 
     const handleChange = (e) => {
@@ -53,7 +76,8 @@ export default function Movies() {
             const newMovie = {
                 name: data.movie,
                 release: data.release,
-                Oscar: data.box 
+                Oscar: data.box ,
+                userId:auth?.currentUser?.uid
             };
     
             await addDoc(moviesCollectionRef, newMovie);
@@ -93,6 +117,14 @@ export default function Movies() {
                         <p>Date: {movie.release}</p>
                         <p>Oscar: {movie.Oscar}</p>
                         <button onClick={() => deleteMoive(movie.id)}>Delete</button>
+
+                        <input type='text' value={updateTitle} onChange={(e) => setUpdateMoive(e.target.value)} />
+                        <button onClick={()=>updateMoive(movie.id)}>Submit</button>
+
+                        <input type='file' onChange={(e)=> setFileUplode(e.target.files)}/>
+
+
+                        <button onClick={uploadFile}>upload</button> 
                     </div>
                 ))}
             </div>
